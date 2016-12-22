@@ -17,7 +17,7 @@ import org.junit.Test;
 public class MyLinkedListTester {
 
 	private static final int LONG_LIST_LENGTH =10; 
-	
+
 	MyLinkedList<String> shortList;
 	MyLinkedList<Integer> emptyList;
 	MyLinkedList<Integer> longerList;
@@ -29,20 +29,15 @@ public class MyLinkedListTester {
 	@Before
 	public void setUp() throws Exception {
 		// Feel free to use these lists, or add your own
-		
-			
 	    shortList = new MyLinkedList<String>();
 		shortList.add("A");
 		shortList.add("B");
-		
 		emptyList = new MyLinkedList<Integer>();
-		
 		longerList = new MyLinkedList<Integer>();
 		for (int i = 0; i < LONG_LIST_LENGTH; i++)
 		{
 			longerList.add(i);
 		}
-		
 		list1 = new MyLinkedList<Integer>();
 		list1.add(65);
 		list1.add(21);
@@ -58,27 +53,26 @@ public class MyLinkedListTester {
 	@Test
 	public void testGet()
 	{
-		// test short list, first contents, then out of bounds
-		assertEquals("Check first", "A", shortList.get(0));
-		assertEquals("Check second", "B", shortList.get(1));
-		
 		//test empty list, get should throw an exception
 		try {
 			emptyList.get(0);
-			fail("Check out of bounds");		
+			fail("Check out of bounds");
 		}
 		catch (IndexOutOfBoundsException e) {
 			
 		}
-					
+		
+		// test short list, first contents, then out of bounds
+		assertEquals("Check first", "A", shortList.get(0));
+		assertEquals("Check second", "B", shortList.get(1));
+		
 		try {
 			shortList.get(-1);
-			fail("Check out of bounds2");
+			fail("Check out of bounds");
 		}
 		catch (IndexOutOfBoundsException e) {
 		
 		}
-		
 		try {
 			shortList.get(2);
 			fail("Check out of bounds");
@@ -119,8 +113,8 @@ public class MyLinkedListTester {
 		assertEquals("Remove: check a is correct ", 65, a);
 		assertEquals("Remove: check element 0 is correct ", (Integer)21, list1.get(0));
 		assertEquals("Remove: check size is correct ", 2, list1.size());
+		assertEquals("Remove: get(0).prev is correct ", null, list1.getNode(0).prev.data);
 		
-		// TODO: Add more tests here
 	}
 	
 	/** Test adding an element into the end of the list, specifically
@@ -129,19 +123,22 @@ public class MyLinkedListTester {
 	@Test
 	public void testAddEnd()
 	{
-        // TODO: implement this test
-		
+		shortList.add("C");
+		assertEquals("AddEnd: check element 2 is correct ", "C", shortList.get(2));
+		assertEquals("AddEnd: check size is correct ", 3, shortList.size());
 	}
 
+	
 	/** Test the size of the list */
 	@Test
 	public void testSize()
 	{
-		// TODO: implement this test
 		assertEquals("Checking size", 0, emptyList.size);
 		assertEquals("Checking size", 3, list1.size);
 	}
 
+	
+	
 	/** Test adding an element into the list at a specified index,
 	 * specifically:
 	 * public void add(int index, E element)
@@ -149,23 +146,23 @@ public class MyLinkedListTester {
 	@Test
 	public void testAddAtIndex()
 	{
-        // TODO: implement this test
 		list1.add(1, 100); 
 		assertEquals("Checking AddAtIndex()", (Integer)100, list1.get(1));
 		assertEquals("Checking AddAtIndex()", (Integer)21, list1.get(2));
 		assertEquals("Checking AddAtIndex()", (Integer)65, list1.get(0));
 		assertEquals("Checking AddAtIndex()", 4, list1.size);
+
 	}
-	
+
 	/** Test setting an element in the list */
 	@Test
 	public void testSet()
 	{
-	    // TODO: implement this test
 		shortList.set(0, "AA");
-		assertEquals("Checking Set()", "AA", shortList.get(0));    
+		assertEquals("Checking Set()", "AA", shortList.get(0)); 
+	    
 	}
-		
-	// TODO: Optionally add more test methods.
+	
+	
 	
 }

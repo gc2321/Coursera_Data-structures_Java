@@ -4,6 +4,7 @@
 package spelling;
 
 import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,13 +23,13 @@ public class WPTree implements WordPath {
 	// used to search for nearby Words
 	private NearbyWords nw; 
 	
-	private static final int THRESHOLD = 70000; 
+	private static final int THRESHOLD = 70000;
 	
 	// This constructor is used by the Text Editor Application
 	// You'll need to create your own NearbyWords object here.
 	public WPTree () {
 		this.root = null;
-		// TODO initialize a NearbyWords object
+		
 		Dictionary d = new DictionaryHashSet();
 		DictionaryLoader.loadDictionary(d, "data/dict.txt");
 		this.nw = new NearbyWords(d);
@@ -43,19 +44,16 @@ public class WPTree implements WordPath {
 	// see method description in WordPath interface
 	public List<String> findPath(String word1, String word2) 
 	{
-	    // TODO: Implement this method.
-		
 		List<String> result = new LinkedList<String>();
-		
-		
+
 		if (!nw.dict.isWord(word1)){
-			result.add(word1+" is not a word.");
+			result.add(word1+" is not a word. ");
 			return result;
-		}else if(!nw.dict.isWord(word2)){
+		}
+		if(!nw.dict.isWord(word2)){
 			result.add(word2+" is not a word.");
 			return result;
 		}
-		
 		
 		List<WPTreeNode> queue = new ArrayList<WPTreeNode>();		
 		List<String> visited = new LinkedList<String>();		
@@ -63,36 +61,42 @@ public class WPTree implements WordPath {
 		
 		WPTreeNode current = new WPTreeNode(word1, root);	
 		queue.add(current);
-		
+
 		int count = 0;
-		
-		while(!queue.isEmpty() && count < this.THRESHOLD){
-			current = queue.get(0);		
-			List<String> neighbors = nw.distanceOne(current.getWord(), true);
+
+		while(!queue.isEmpty() && count < THRESHOLD){
 			
-			for (String i : neighbors){
+			current = queue.get(0);	
+			
+			List<String> children = nw.distanceOne(current.getWord(), true);
+
+			for (String i : children){
 				if (!visited.contains(i)){
 					visited.add(i);
 					current.addChild(i);
-					WPTreeNode child = new WPTreeNode(i, current);
-					queue.add(child);
 					
+					// add parent information to child TreeNode, add child TreeNode to queue
+					WPTreeNode childTreeNode = new WPTreeNode(i, current);
+					queue.add(childTreeNode);
+					
+					// check if child is word2
 					if (i.equals(word2)){
-						result = child.buildPathToRoot();
-						return result;
+						return childTreeNode.buildPathToRoot();
 					}
 				}
 			}
+
+			count += children.size();
 			
-			count += neighbors.size();
-			if (count > this.THRESHOLD){
+			if (count > THRESHOLD){
 				result.add("Distance is too far.");
 				return result;
 			}
-					
+
 			queue.remove(0);
-		}	
-	    return result;
+		} 
+		
+		return result;
 	}
 	
 	// Method to print a list of WPTreeNodes (useful for debugging)
@@ -104,18 +108,6 @@ public class WPTree implements WordPath {
 		}
 		ret+= "]";
 		return ret;
-	}
-	
-	public static void main(String[] args) {
-		
-		WPTree w = new WPTree();
-		List<String> list = new LinkedList<String>();
-		
-		list = w.findPath("the", "horse");
-		
-		System.out.println(list);
-		
-		
 	}
 	
 }

@@ -29,6 +29,7 @@ public class DictionaryHashSet implements Dictionary
 	public boolean addWord(String word) 
 	{
 		return words.add(word.toLowerCase());
+		//return words.add(word);
 	}
 
 	/** Return the number of words in the dictionary */
@@ -42,6 +43,7 @@ public class DictionaryHashSet implements Dictionary
     @Override
 	public boolean isWord(String s) {
     	return words.contains(s.toLowerCase());
+    	//return words.contains(s);
 	}
 	
    

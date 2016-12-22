@@ -4,58 +4,59 @@ import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 /** 
  * An trie data structure that implements the Dictionary and the AutoComplete ADT
- * @author 
+ * @author You
  *
  */
-public class AutoCompleteDictionaryTrie implements Dictionary, AutoComplete {
+public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 
     private TrieNode root;
     private int size;
     
+
     public AutoCompleteDictionaryTrie()
 	{
-		this.root = new TrieNode();
-		this.size=0;
+		root = new TrieNode();
 	}
 		
 	/** Insert a word into the trie.
-	 * For the basic part of the assignment (part 2), you should ignore the word's case.
-	 * That is, you should convert the string to all lower case as you insert it. */
-	public boolean addWord(String word)
-	{
-	    //TODO: Implement this method.
+	 * For the basic part of the assignment (part 2), you should convert the 
+	 * string to all lower case before you insert it. 
+	 * 
+	 * This method adds a word by creating and linking the necessary trie nodes 
+	 * into the trie, as described outlined in the videos for this week. It 
+	 * should appropriately use existing nodes in the trie, only creating new 
+	 * nodes when necessary. E.g. If the word "no" is already in the trie, 
+	 * then adding the word "now" would add only one additional node 
+	 * (for the 'w').
+	 * 
+	 * @return true if the word was successfully added or false if it already exists
+	 * in the dictionary.
+	 */
+    public boolean addWord(String word)
+    {
+    	String wordAdd = word.toLowerCase();
+    	TrieNode current = this.root;
+
+    	// if word is in Trie, return false
+    	if (isWord(word)){		
+    		return false;
+    	}
+
+    	for (int i = 0; i< wordAdd.length(); i++){
+    		current = current.insert(wordAdd.charAt(i));
+    	}
 		
-		String wordAdd = word.toLowerCase();
-		TrieNode current = this.root;
+		// at the last Char, set EndsWord as true
+		current.setEndsWord(true);
 		
-		if (isWord(word)){
-			return false;
-		}
+		this.size +=1;
 		
-		String text = "";
-		
-		for (int i = 0; i< wordAdd.length(); i++){
-			
-			current.insert(wordAdd.charAt(i));
-			current = current.getChild(wordAdd.charAt(i));
-			text = text + wordAdd.charAt(i);
-			current.setText(text);
-			
-			// end of the word
-			if (i==wordAdd.length()-1 && !current.endsWord()){
-				current.setEndsWord(true);
-				this.size +=1;
-				return true;
-			}
-		}
-	    return false;
+		return true;
 	}
 	
 	/** 
@@ -64,39 +65,15 @@ public class AutoCompleteDictionaryTrie implements Dictionary, AutoComplete {
 	 */
 	public int size()
 	{
-	    //TODO: Implement this method
 	    return this.size;
 	}
 	
-	/** find and return specific TrieNode that exists in trie 
-	 * add by me
-	 * */	
-	public TrieNode getNode(TrieNode node) 
-	{
-		String text = node.getText();
-		TrieNode current = this.root;
-		
-		for (int i = 0; i< text.length(); i++){
-			
-			current = current.getChild(text.charAt(i));		
-			
-			if (current == null){
-				break;
-			}		
-			// end of the word
-			if (i==text.length()-1){
-				return current;		
-			}
-		}
-		return current;
-	}
 	
-	
-	/** Returns whether the string is a word in the trie */
+	/** Returns whether the string is a word in the trie, using the algorithm
+	 * described in the videos for this week. */
 	@Override
 	public boolean isWord(String s) 
 	{
-	    // TODO: Implement this method
 		String wordAdd = s.toLowerCase();
 		TrieNode current = this.root;
 		
@@ -104,25 +81,36 @@ public class AutoCompleteDictionaryTrie implements Dictionary, AutoComplete {
 			
 			if (current.getChild(wordAdd.charAt(i))==null){
 				return false;
-			}else{
-				current = current.getChild(wordAdd.charAt(i));	
 			}
-		
-			// end of the word
-			if (i==wordAdd.length()-1){
-				return current.endsWord();		
-			}
+			
+			current = current.getChild(wordAdd.charAt(i));	
 		}
-	    return false;
+		
+		// current at the last char of String s
+		return current.endsWord();		
+			
 	}
 
 	/** 
-	 *  * Returns up to the n "best" predictions, including the word itself,
-     * in terms of length
-     * If this string is not in the trie, it returns null.
-     * @param text The text to use at the word stem
-     * @param n The maximum number of predictions desired.
-     * @return A list containing the up to n best predictions
+     * Return a list, in order of increasing (non-decreasing) word length,
+     * containing the numCompletions shortest legal completions 
+     * of the prefix string. All legal completions must be valid words in the 
+     * dictionary. If the prefix itself is a valid word, it is included 
+     * in the list of returned words. 
+     * 
+     * The list of completions must contain 
+     * all of the shortest completions, but when there are ties, it may break 
+     * them in any order. For example, if there the prefix string is "ste" and 
+     * only the words "step", "stem", "stew", "steer" and "steep" are in the 
+     * dictionary, when the user asks for 4 completions, the list must include 
+     * "step", "stem" and "stew", but may include either the word 
+     * "steer" or "steep".
+     * 
+     * If this string prefix is not in the trie, it returns an empty list.
+     * 
+     * @param prefix The text to use at the word stem
+     * @param numCompletions The maximum number of predictions desired.
+     * @return A list containing the up to numCompletions best predictions
      */@Override
      public List<String> predictCompletions(String prefix, int numCompletions) 
      {
@@ -142,54 +130,59 @@ public class AutoCompleteDictionaryTrie implements Dictionary, AutoComplete {
     	 // Return the list of completions
     	 
     	 List<String>result = new ArrayList<String>();
-    	 result = this.Bfs_trie(new TrieNode(prefix));
-    	 
-    	 if (result.size()<1){
-    		 return result;
-    	 }
-    	 
-    	 if (result.size() > numCompletions){
-    		 return result.subList(0, numCompletions);
-    	 }
-    	  	 
-    	 return result;
-    	 
-     }
-     
-     public List<String> Bfs_trie(TrieNode node){
-    	 
-    	 List<String>result = new ArrayList<String>();
-    	 
-    	 TrieNode current = getNode(node);    
-    	 
-    	 if (current==null){
-    		 return result;
-    	 }
-    	 	 
+
+    	 TrieNode current = getNode(prefix) ;
+
+    	 // if stem is empty, return empty list
+    	 if (current==null) return result;
+
+
     	 // list of TrieNodes
     	 List<TrieNode>queue = new LinkedList<TrieNode>();
     	 queue.add(current);
-    		    	 
-    	 while(!queue.isEmpty()){
-			 current = queue.get(0);
 
-	    	 for (char i : current.getValidNextCharacters()){
-	    		 
-	    		 // add all valid characters to queue
-	    		 queue.add(current.getChild(i));    		 
-	    	 }
-	    	
-	    	 // if stem is a word, add word to result
-	    	 if (current.endsWord()){
-				 result.add(current.getText());
-			 }
-			 queue.remove(0);
-    	} 	    	   	 
-    	 return result;    	 
+    	 while(!queue.isEmpty()){
+    		 current = queue.get(0);
+
+    		 for (char i : current.getValidNextCharacters()){
+
+    			 // add all valid characters to queue
+    			 queue.add(current.getChild(i));    		 
+    		 }
+
+    		 // if stem is a word, add word to result
+    		 if (current.endsWord()){
+    			 result.add(current.getText());
+    		 }
+    		 queue.remove(0);
+    	 } 
+
+    	 if (result.size() > numCompletions){
+    		 return result.subList(0, numCompletions);
+    	 }
+    	 return result;
+
      }
      
+     /** find and return specific TrieNode that exists in trie 
+ 	 * add by me
+ 	 * */	
+     public TrieNode getNode(String prefix) 
+     {
+    	 TrieNode current = this.root;
 
-     
+    	 for (int i = 0; i< prefix.length(); i++){
+
+    		 current = current.getChild(prefix.charAt(i));		
+
+    		 if (current == null){
+    			 return null;
+    		 }		
+    		 
+    	 }
+    	 return current;
+     }
+   
  	// For debugging
  	public void printTree()
  	{
@@ -230,10 +223,10 @@ public class AutoCompleteDictionaryTrie implements Dictionary, AutoComplete {
  		test.addWord("steer");
  		test.addWord("steep");
  		
- 		System.out.println(test.predictCompletions("x", 4).size());
- 		System.out.println(test.predictCompletions("x", 4));
+ 		System.out.println(test.predictCompletions("pa", 4).size());
+ 		System.out.println(test.predictCompletions("pa", 4));
 		//System.out.println(test.size()); 
 		//test.printTree();
- 	}
+}
 	
 }

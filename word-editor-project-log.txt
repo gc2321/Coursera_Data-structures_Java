@@ -1,0 +1,208 @@
+
+
+This is a part of the Coursera course titled "Data Structures and Performance" by University of California, San Diego.
+
+This project is a Java Text Editor with spell-check and auto-complete function. I authored the functions as listed below:
+
+(1) Functions that use Regular Expression to count number of syllables, words, and syllables in a given text. 
+
+//src/document/EfficientDocument.java
+getNumWords()		// get number of words in textblock, regular expression
+getNumSentences()	// get number of sentences in textblock, regular expression
+getNumSyllables()	// get number of Syllables in textblock, //src/document/Document.java/countSyllables(String word)  
+void processText()	// process textblock and get Words, Sentences and Syllables numbers
+
+The text was split into a ArrayList of tokens with pattern matching "[!?.]+|[a-zA-Z]+".
+A word is defined as anything that is not matching "!" o "?" or "."
+A sentence is defined as anything that is not a word.
+
+A syllable is defined as contiguous sequence of one or more vowels, including "y". The exception is that a lone "e" at the end of a word 
+is not considered a syllable unless the word has no other syllables. 
+
+For each word, I used pattern matching "[aeiuoyAEIOUY]+" to get all the syllables. 
+List<String>tokens = getTokens("[aeiuoyAEIOUY]+", word);
+
+I also replaced the words that ends in "e" with
+List<String>end_e = getTokens("[aeiuoyAEIOUY]+", word.replaceAll("e$", ""));
+
+To get syllables:
+
+	if(end_e.size()==tokens.size()){
+		return tokens.size();
+	}else if (end_e.size()==0){
+			return tokens.size();
+	}else{
+			return Math.min(tokens.size(), end_e.size());
+	}
+
+Using the counts of syllables, words and sentences, I computed the Flesch score of given text. 
+
+Flesch score indicates how easy a text is to read and is calculated as below:
+
+Flesch score = 206.835 - 1.015 (# words/# sentences) - 84.6 (# syllables / # words)
+
+High score (>90)	-> Easy to read. Easily understood by elementary school students.
+Low score (<30) 	-> Difficult to read. Best understood by university graduates.
+
+Reference for Flesch score and Flesch–Kincaid readability tests
+https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
+
+(2) Function to generate Markov text. A Markov text is a text generated based on the order of words of the original text.
+
+/src/textgen/MarkovRextGeneratorLoL.java
+train(String sourceText)							// built a list (wordList) of words in the text, and for each word, include a list of nextWords
+findWordList(String a, List<ListNode>wordList)		// helper method to return the index of word in wordList
+generateText(int numWords) 							// generate random list of words based on the order of nextWords
+retrain(String sourceText)							// reset wordList, starter, sourceText in re-training
+
+I authored a function, train(), to train the order of words from the original text. 
+I stored in a LinkedList every unique word of the original text together with a list-of-next-words immediately proceeds this word. 
+
+Using StringBuilder, I authored a function to generate Markov text, generateText(), starting with the first word of the original text. 
+For each word I generated next word by randomly retrieving a word from the list-of-next-words of the corresponding word.
+
+(3) Spell check function. I authored a function to store a dictionary of words using binary tree. 
+At the end, I used the recommended HashSet to build the dictionary.
+
+/src/spelling/DictionaryBST.java
+added constructor
+addWord(String word)								// add word to dictionary
+int size()											// return the size of dictionary
+isWord(String s)									// check if String s is in dictionary
+
+The spell check function checks whether a given word is in a dictionary.
+
+(4) Auto-complete function.
+
+/src/spelling/AutoCompleteDictionary.java
+addWord(String word)									// add word to a Trie
+isWord(String s) 										// determine if String s is a word in a Trie
+predictCompletions(String prefix, int numCompletions) 	// Using breath-first search to return a list of word suggestions
+getNode(String prefix) 									// given a prefix, return the corresponding node in the Trie 
+														// helpfer method in predictCompletions
+													
+To implement this function, I stored each word in a Trie. 
+
+In predictCompletions(), given a String prefix, I find the corresponding prefix in the Trie,
+and retrieve all child nodes that is a words using breath-first search. I returned the defined number of words as needed (numCompletions).
+
+(5) Spelling suggestions. When a word was spelled incorrectly, this function provides a list of closely related words.
+
+/src/spelling/NearbyWords.java		
+insertions(String s, List<String> currentList, boolean wordsOnly ) 		// insert each char at each position in the word, distance of 1
+deletions(String s, List<String> currentList, boolean wordsOnly )		// delete each char at each position in the word, distance of 1
+											
+canAdd(String o, String s, List<String> currentList, boolean wordsOnly)	// check if mutated word can be added to list of new words
+																		// helper method for substituition, insertion, deletion
+																		
+suggestions(String word, int numSuggestions) 							// using breath-first search to produce a list of suggest words
+
+In NearbyWords.java, the function distanceOne() usese insertion, substituition and deletion to generate a list of closely related words.
+
+I authored the insertions and deletions function where char were inserted or removed from the original word.
+
+Using breath-first search, I search and return a list of related words in the suggestions().
+
+(6) Distance between two words. Edit distance function. Given two words, word1 and word2, 
+this function generates a list of intermediate words in which when mutating word1 leads to word2.
+
+/src/spelling/WPTree.java		
+findPath(String word1, String word2) 			// use breath-first search to produce a list of intermediate words.
+
+I authored the findPath(). For word1, generate a list of distanceOne() words. Using breath-first search, check if words is in the list. 
+If not, proceed to get the distanceOne() words of the first set of distanceOne() words.
+
+(7) JUnit tests to check some of the functions listed above.
+
+In addition to the above, I also authored several other functions in this course to learn about data structures in Java in a serials of program assignments (PS).
+The purpose and detail location of each function are listed below.
+
+PS#1.
+//src/document/Document.java
+countSyllables(String word)  				// get number of Syllables in word
+getTokens(String pattern, String word)		// get pattern of word, overloading
+getFlesschScore()							// get Flesch Score
+
+/src/document/BasicDocument.java
+getNumWords()		// get number of words in textblock, regular expression
+getNumSentences()	// get number of sentences in textblock, regular expression
+getNumSyllables()	// get number of Syllables in textblock
+
+PS#2.
+
+/src/document/EfficientDocument.java
+getNumWords()		// get number of words in textblock, regular expression
+getNumSentences()	// get number of sentences in textblock, regular expression
+getNumSyllables()	// get number of Syllables in textblock
+void processText()	// process textblock and get Words, Sentences and Syllables numbers
+
+/src/document/DocumentBenchmarking.java
+main() - for-loop content		// benchmarking time to execute BasicDocument and EfficientDocument
+
+PS#3a. // implemented LinkedList class and junit test
+
+/src/textgen/MyLinkedList.java
+MyLinkedList() 					// constructor
+add(E element)					// add a node to end of the list
+add(int index, E element) 		// add a node to specific index
+get(int index)					// return the element at index
+getNode(int index)            	// return the Node at index
+int size()						// return the size of list
+remove(int index)				// remove a node at index
+E set(int index, E element) 	// set a value of node at index
+
+class LLNode<E>, added another constructor
+
+/src/textgen/MyLinkedListTester.java
+testRemove() - added last test
+testAddEnd()
+testSize()
+testAddAtIndex()
+testSet()
+
+PS#3b. // Markov text
+/src/textgen/MarkovRextGeneratorLoL.java
+train(String sourceText)							// built a list (wordList) of words in the text, and for each word, include a list of nextWords
+findWordList(String a, List<ListNode>wordList)		// helper method to return the index of word in wordList
+generateText(int numWords) 							// generate random list of words based on the order of nextWords
+retrain(String sourceText)							// reset wordList, starter, sourceText in re-training
+
+class ListNode
+String getRandomNextWord(Random generator)  		// get random words for the list of nextWords
+
+PS#4. // implement dictionary, auto-complete function
+
+/src/spelling/DictionaryLL.java
+added constructor
+addWord(String word)								// add word to dictionary
+int size()											// return the size of dictionary
+isWord(String s)									// check if String s is in dictionary
+
+/src/spelling/DictionaryBST.java
+added constructor
+addWord(String word)								// add word to dictionary
+int size()											// return the size of dictionary
+isWord(String s)									// check if String s is in dictionary
+
+/src/spelling/AutoCompleteDictionary.java
+addWord(String word)								// add word to a Trie
+isWord(String s) 									// determine if String s is a word in a Trie
+predictCompletions(String prefix, int numCompletions) // Using breath-first search to return a list of word suggestions
+getNode(String prefix) 								// given a prefix, return the corresponding node in the Trie 
+													// helpfer method in predictCompletions
+
+PS#5a. // spelling suggestions													
+/src/spelling/NearbyWords.java													
+insertions(String s, List<String> currentList, boolean wordsOnly ) 		// insert each char at each position in the word, distance of 1
+deletions(String s, List<String> currentList, boolean wordsOnly )		// delete each char at each position in the word, distance of 1
+											
+canAdd(String o, String s, List<String> currentList, boolean wordsOnly)	// check if mutated word can be added to list of new words
+																		// helper method for substituition, insertion, deletion
+																		
+suggestions(String word, int numSuggestions) 							// Using breath-first search to produce a list of suggest words
+
+PS#5b. // edit distance
+/src/spelling/WPTree.java		
+findPath(String word1, String word2) 			// use breath-first search to produce a list of intermediate words.
+
+

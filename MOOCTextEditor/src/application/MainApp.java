@@ -21,6 +21,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 
+
+
 public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
@@ -32,7 +34,7 @@ public class MainApp extends Application {
 		
 		this.primaryStage = primaryStage;
 		
-		this.primaryStage.setTitle("TextProApp");
+		this.primaryStage.setTitle("Text Pro App");
 		
 		try {
 			// Load root layout from fxml

@@ -43,7 +43,6 @@ public class AutoCompleteDictionaryTrieTester {
 		smallDict.addWord("a");
 		smallDict.addWord("subsequent");
 		
-		
 		DictionaryLoader.loadDictionary(largeDict, dictFile);
 	}
 
@@ -52,9 +51,7 @@ public class AutoCompleteDictionaryTrieTester {
 	 */
 	@Test
 	public void testSize()
-	{	
-		//System.out.println(emptyDict.size());
-		
+	{
 		assertEquals("Testing size for empty dict", 0, emptyDict.size());
 		assertEquals("Testing size for small dict", 8, smallDict.size());
 		assertEquals("Testing size for large dict", 4438, largeDict.size());
@@ -89,7 +86,7 @@ public class AutoCompleteDictionaryTrieTester {
 	
 	/** Test the addWord method */
 	@Test
-	public void addWord()
+	public void testAddWord()
 	{
 		
 		

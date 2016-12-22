@@ -27,8 +27,8 @@ import org.fxmisc.richtext.StyledTextArea;
 
 public class AutoSpellingTextArea extends StyledTextArea<Boolean> {
 
-	private static final int NUM_COMPLETIONS = 6;
-	private static final int NUM_SUGGESTIONS = 6;
+	private static final int NUM_COMPLETIONS = 7;
+	private static final int NUM_SUGGESTIONS = 7;
 
 	// track auto complete and spelling suggestion states
 	private boolean autoCompleteOn = false;
@@ -364,7 +364,7 @@ public class AutoSpellingTextArea extends StyledTextArea<Boolean> {
 	public void setSpelling(boolean state) {
 		spellingOn = state;
 
-		if (state = true && getText().length() > 0) {
+		if (state == true && getText().length() > 0) {
 			this.setStyleSpans(0, checkSpelling());
 		}
 		// change all text to true/correct style

@@ -50,13 +50,12 @@ class TrieNode {
 	public TrieNode insert(Character c)
 	{
 		if (children.containsKey(c)) {
-			return null;
+			//return null;
+			return children.get(c);
 		}
 		
 		TrieNode next = new TrieNode(text + c.toString());
-		
 		children.put(c, next);
-		
 		return next;
 	}
 	
@@ -65,11 +64,7 @@ class TrieNode {
 	{
 		return text;
 	}
-    /** Set the text string at this node */
-    public void setText(String text)
-	{
-    	this.text = text;
-	}
+	
     /** Set whether or not this node ends a word in the trie. */
 	public void setEndsWord(boolean b)
 	{

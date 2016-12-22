@@ -5,14 +5,13 @@ package document;
  * @author UC San Diego Intermediate Programming MOOC team
  */
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Document {
 
-	protected String text;
+	private String text;
 	
 	/** Create a new document from the given text.
 	 * Because this class is abstract, this is used only from subclasses.
@@ -43,60 +42,58 @@ public abstract class Document {
 		return tokens;
 	}
 	
-	// This is a helper function that returns the number of syllables
-	// in a word.  You should write this and use it in your 
-	// BasicDocument class.
-	// You will probably NOT need to add a countWords or a countSentences method
-	// here.  The reason we put countSyllables here because we'll use it again
-	// next week when we implement the EfficientDocument class.
+	protected List<String> getTokens(String pattern, String word)
+	{
+		ArrayList<String> tokens = new ArrayList<String>();
+		Pattern tokSplitter = Pattern.compile(pattern);
+		Matcher m = tokSplitter.matcher(word);
+		
+		while (m.find()) {
+			tokens.add(m.group());
+		}
+		
+		return tokens;
+	}
+	
+	
+	/** This is a helper function that returns the number of syllables
+	 * in a word.  You should write this and use it in your 
+	 * BasicDocument class.
+	 * 
+	 * You will probably NOT need to add a countWords or a countSentences 
+	 * method here.  The reason we put countSyllables here because we'll 
+	 * use it again next week when we implement the EfficientDocument class.
+	 * 
+	 * For reasons of efficiency you should not create Matcher or Pattern 
+	 * objects inside this method. Just use a loop to loop through the 
+	 * characters in the string and write your own logic for counting 
+	 * syllables.
+	 * 
+	 * @param word  The word to count the syllables in
+	 * @return The number of syllables in the given word, according to 
+	 * this rule: Each contiguous sequence of one or more vowels is a syllable, 
+	 *       with the following exception: a lone "e" at the end of a word 
+	 *       is not considered a syllable unless the word has no other syllables. 
+	 *       You should consider y a vowel.
+	 */
 	protected int countSyllables(String word)
 	{
 		// TODO: Implement this method so that you can call it from the 
 	    // getNumSyllables method in BasicDocument (module 1) and 
 	    // EfficientDocument (module 2).
-		int count = 0;
-        int next = 0;
-        String s  = word;
-        for (int i = 0; i < s.length(); i++){
-
-            if( checkVowel(s.charAt(i)) ){
-                if (next==0){
-                    count +=1;
-                    next = 1;
-                }else{
-                    next = 1;
-                }
-
-            }else{
-                next = 0;
-            }
-        }
-        // remove words with lone "e" at the end
-
-        if (s.length()>1 && s.charAt(s.length()-1)=='e' && !checkVowel(s.charAt(s.length()-2)) && count >1){
-            count -=1;
-        }
-
-        return count;
-	}
-
-	protected boolean checkVowel(char letter) {
-		// check if letter is a vowel or y
-		if( Arrays.asList('a','e','i','o','u','y', 'A','E','I','O','U','Y').contains(letter) ){
-			return true;
+		List<String>tokens = getTokens("[aeiuoyAEIOUY]+", word);
+		List<String>end_e = getTokens("[aeiuoyAEIOUY]+", word.replaceAll("e$", ""));
+		
+		if(end_e.size()==tokens.size()){
+			return tokens.size();
+		}else if (end_e.size()==0){
+			return tokens.size();
 		}else{
-			return false;
+			return Math.min(tokens.size(), end_e.size());
 		}
+		
 	}
-
-	protected boolean checkPun(char letter) {
-		// check if letter is a vowel or y
-		if( Arrays.asList('?','!','.').contains(letter) ){
-			return true;
-		}else{
-			return false;
-		}
-	}
+	
 	/** A method for testing
 	 * 
 	 * @param doc The Document object to test
@@ -157,16 +154,12 @@ public abstract class Document {
 	/** return the Flesch readability score of this document */
 	public double getFleschScore()
 	{
-	    // TODO: Implement this method
-		double score = 0;
-		
+	    // TODO: Implement this method in week 1
 		int words = getNumWords();
 		int sentences = getNumSentences();
 		int syllables = getNumSyllables();
-		
-		score = 206.835 - (1.015*(words/sentences)) -(84.6*(syllables/words));
-		
-	    return score;
+	    return 206.835 - (1.015*(words/sentences))-(84.6*(syllables/words));
+	    
 	}
 	
 	
